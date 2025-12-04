@@ -1,0 +1,27 @@
+{
+  "name": "agentcore-strands-ts",
+  "version": "0.1.0",
+  "bin": {
+    "agentcore-strands-ts": "bin/agentcore-strands-ts.js"
+  },
+  "scripts": {
+    "build": "bun run tsc",
+    "watch": "bun run tsc -w",
+    "test": "bun test",
+    "cdk": "bunx cdk"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^24.10.1",
+    "aws-cdk": "2.1033.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-bedrock-agentcore-alpha": "^2.223.0-alpha.0",
+    "aws-cdk-lib": "^2.231.0",
+    "constructs": "^10.0.0"
+  }
+}
