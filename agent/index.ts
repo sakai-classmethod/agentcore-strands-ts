@@ -1,6 +1,5 @@
 import { Agent, BedrockModel, tool } from '@strands-agents/sdk'
-import type { Request, Response } from 'express'
-import express from 'express'
+import { Hono } from 'hono'
 import { z } from 'zod'
 
 const PORT = process.env.PORT || 8080
@@ -54,32 +53,35 @@ const agentWithTools = new Agent({
   tools: [weatherTool],
 })
 
-const app = express()
+const app = new Hono()
 
-app.get('/ping', (_req: Request, res: Response) =>
-  res.json({
+app.get('/ping', (c) =>
+  c.json({
     status: 'Healthy',
     time_of_last_update: Math.floor(Date.now() / 1000),
   })
 )
 
-app.post('/invocations', express.raw({ type: '*/*' }), async (req: Request, res: Response) => {
+app.post('/invocations', async (c) => {
   try {
-    const prompt = new TextDecoder().decode(req.body)
+    const prompt = await c.req.text()
     console.log(`Received prompt: ${prompt}`)
 
     const result = await agentWithTools.invoke(prompt)
     console.log(`Response stopReason: ${result.stopReason}`)
 
-    return res.json({ response: result })
+    return c.json({ response: result })
   } catch (err) {
     console.error('Error processing request:', err)
-    return res.status(500).json({ error: 'Internal server error' })
+    return c.json({ error: 'Internal server error' }, 500)
   }
 })
 
-app.listen(PORT, () => {
-  console.log(`AgentCore Runtime server listening on port ${PORT}`)
-})
+export default {
+  fetch: app.fetch,
+  port: Number(PORT),
+}
+
+console.log(`AgentCore Runtime server listening on port ${PORT}`)
 
 export { runInvoke, runStreaming, defaultAgent, agentWithoutTools, agentWithTools }
